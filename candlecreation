@@ -1,0 +1,80 @@
+from pymongo import MongoClient
+import numpy as np
+import json
+
+data = {}
+data['key'] = 'value'
+json_data = json.dumps(data)
+ds1=np.datetime64('2021-03-24 09:36')
+fs1=ds1+ np.arange(354)
+print("code ...")
+print(str(fs1.__getitem__(0)).replace('T',' '))
+ds=np.datetime64('2021-03-24 09:36', 's')
+fs=ds+ np.arange(60)
+print(str(fs.__getitem__(0)).replace('T',' '))
+listoftimes=[]
+for k in range(fs1.size):
+    tempds = np.datetime64(fs1.__getitem__(k), 's')
+    print(type(tempds))
+    tempfs = tempds + np.arange(60)
+    #print(tempfs.ravel())
+    listoftimes.append(tempfs)
+listoftimesfinal=[]
+print(listoftimes)
+t=len(listoftimes)
+m=len(listoftimes.__getitem__(0))
+
+for k in range(t):
+    for z in range(m):
+        listoftimesfinal.append(str(listoftimes.__getitem__(k).__getitem__(z)).replace('T',' '))
+       # print(str(listoftimes.__getitem__(0).__getitem__(0)).replace('T',' '))
+        #print(str(listoftimes.__getitem__(k).__getitem__(z)).replace('T',' '))
+print(listoftimesfinal)
+client=MongoClient()
+db=client.mydatabase2
+posts=db.data
+
+mydb = client["mydatabase3"]
+mycol = mydb["data"]
+
+list=['NSE:AARTIIND', 'NSE:ACC', 'NSE:ADANIENT', 'NSE:ADANIPORTS', 'NSE:AMARAJABAT', 'NSE:APOLLOHOSP', 'NSE:APOLLOTYRE', 'NSE:ASHOKLEY', 'NSE:ASIANPAINT', 'NSE:AUROPHARMA', 'NSE:BAJAJ-AUTO', 'NSE:BAJAJFINSV', 'NSE:BAJFINANCE', 'NSE:BALKRISIND', 'NSE:BANDHANBNK', 'NSE:BANKBARODA', 'NSE:BERGEPAINT', 'NSE:BHARATFORG', 'NSE:BHARTIARTL', 'NSE:CUMMINSIND', 'NSE:FEDERALBNK', 'NSE:GODREJPROP', 'NSE:HEROMOTOCO', 'NSE:HINDUNILVR', 'NSE:IBULHSGFIN', 'NSE:ICICIPRULI', 'NSE:IDFCFIRSTB', 'NSE:INDUSINDBK', 'NSE:INDUSTOWER', 'NSE:INFY', 'NSE:IRCTC', 'NSE:JINDALSTEL', 'NSE:LALPATHLAB', 'NSE:LTI', 'NSE:LTTS', 'NSE:MANAPPURAM', 'NSE:MCDOWELL-N', 'NSE:MOTHERSUMI', 'NSE:MPHASIS', 'NSE:MUTHOOTFIN', 'NSE:NAM-INDIA', 'NSE:NATIONALUM', 'NSE:NAVINFLUOR', 'NSE:PFIZER', 'NSE:PIDILITIND', 'NSE:SRTRANSFIN', 'NSE:TATACONSUM', 'NSE:TATAMOTORS', 'NSE:TCS', 'NSE:TORNTPHARM', 'NSE:TORNTPOWER', 'NSE:TRENT', 'NSE:ULTRACEMCO']
+listhigh=[]
+volume=[]
+
+for k in range(len(listoftimes)):
+    print("hello")
+    for j in range(len(list)):
+        listhigh = []
+        volume = []
+        for i in range(60):
+        #bills_post = posts.find_one({'data.'+list[j] +'.timestamp': str(fs.__getitem__(i)).replace('T',' ')})
+            bills_post = posts.find_one({'data.' + list[j] + '.timestamp':str(listoftimes.__getitem__(k).__getitem__(i)).replace('T',' ') })
+            if(bool(bills_post)):
+               # print(bills_post.get('data').get(list[j]).get('volume'))
+               # print( bills_post.get('data').keys())
+                listhigh.append(bills_post.get('data').get(list[j]).get('last_price'))
+                volume.append(bills_post.get('data').get(list[j]).get('volume'))
+
+        data = {}
+        data['symbol'] = list[j]
+        data['timestamp'] = str(listoftimes.__getitem__(k).__getitem__(0))
+        data['high'] = max(listhigh)
+        data['low'] = min(listhigh)
+        data['open'] = listhigh[0]
+        data['close'] = listhigh[-1]
+        data['volume'] = volume[-1]-volume[0]
+        print(data)
+        x=mycol.insert_one(data)
+        print(data)
+
+
+# json_data = json.dumps(data)
+print(max(listhigh))
+print(min(listhigh))
+print(listhigh[0])
+print(listhigh[-1])
+print(listhigh)
+print(volume[-1]-volume[0])
+
+
+
