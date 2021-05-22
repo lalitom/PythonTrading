@@ -1,0 +1,182 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+df=pd.read_csv("D:\\tradedata27Feb\\BAJFINANCE-EQ.csv",index_col=False)
+#rint(df)
+#print(df["EMA9"])
+print(df["Close"])
+listoftimes=df["Date"]
+#print(df["Date"]=="21-12-2020 09:35")
+#print(df[(df['Date']=='22-12-2020 09:35')]['SMA26'])
+print(df[(df['Date']=='29-12-2020 09:20')]['Close'])
+#print(df[(df['Date']=='22-12-2020 09:35')]['EMA9'])
+BUY=False
+SELL=False
+buyorder=0
+sellorder=0
+firstorder=0
+exitime="15:20"
+notradetime="15:25"
+print(listoftimes)
+dfexpo=pd.DataFrame(columns= ['Date','open','high','low','close','order'])
+for i in listoftimes:
+        if(df[(df["Date"]==i)]["EMA9"].values>df[(df["Date"]==i)]["SMA26"].values and df[(df["Date"]==i)]["EMA9"].values>0 and df[(df["Date"]==i)]["SMA26"].values>0 ):
+            if(BUY==False and buyorder==0 and firstorder==0 and notradetime not in i ):
+               BUY=True
+               print("Iniside buy block ----------> " + str(BUY))
+               SELL=False
+               buyorder=1
+               sellorder=0
+               firstorder=1
+               dfexpo = dfexpo.append({'Date': i, 'order': "Buy",'open':df[df["Date"]==i]["Open"].values,'close':df[df["Date"]==i]["Close"].values,'high':df[df["Date"]==i]["High"].values,'low':df[df["Date"]==i]["Low"].values}, ignore_index=True)
+               print("Buy  =" + str(df[(df["Date"] == i)]))
+               print("Iniside buy block before " + str(BUY) +" "+ str(buyorder) +" " +str(SELL) + i)
+            if (BUY == False and buyorder == 0 and i!=1 and notradetime not in i):
+                BUY = True
+                print("Iniside buy block ----------> " + str(BUY))
+                SELL = False
+                buyorder = 1
+                sellorder = 0
+                dfexpo = dfexpo.append({'Date': i, 'order': "Buy", 'open': df[df["Date"] == i]["Open"].values,
+                                        'close': df[df["Date"] == i]["Close"].values,
+                                        'high': df[df["Date"] == i]["High"].values,
+                                        'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+                dfexpo = dfexpo.append({'Date': i, 'order': "Buy", 'open': df[df["Date"] == i]["Open"].values,
+                                        'close': df[df["Date"] == i]["Close"].values,
+                                        'high': df[df["Date"] == i]["High"].values,
+                                        'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+                print("Buy  =" + str(df[(df["Date"] == i)]))
+                print("Iniside buy block before " + str(BUY) + " " + str(buyorder) + " " + str(SELL) + i)
+        elif(df[(df["Date"]==i)]["EMA9"].values>0 and df[(df["Date"]==i)]["SMA26"].values>0):
+            if(SELL==False and sellorder==0 and firstorder==0 and notradetime not in i):
+              BUY=False
+              SELL=True
+              buyorder = 0
+              sellorder = 1
+              firstorder=1
+              print(i)
+              print(df[(df["Date"]==i)]["SMA26"].values)
+              print(df[(df["Date"] == i)]["EMA9"].values)
+              print(df[df["Date"]==i]["Open"].values)
+              print(df[(df["Date"] == i)]["Close"].values)
+              print(df[df["Date"] == i]["High"].values)
+              print(df[df["Date"] == i]["Low"].values)
+
+              dfexpo = dfexpo.append({'Date': i, 'order': "Sell",'open':df[df["Date"]==i]["Open"].values,'close':df[df["Date"]==i]["Close"].values,'high':df[df["Date"]==i]["High"].values,'low':df[df["Date"]==i]["Low"].values}, ignore_index=True)
+              print("SEll  ="+str(df[(df["Date"]==i)]))
+            if (SELL == False and sellorder == 0 and i !=0 and notradetime not in i) :
+                BUY = False
+                SELL = True
+                buyorder = 0
+                sellorder = 1
+                dfexpo = dfexpo.append({'Date': i, 'order': "Sell", 'open': df[df["Date"] == i]["Open"].values,
+                                        'close': df[df["Date"] == i]["Close"].values,
+                                        'high': df[df["Date"] == i]["High"].values,
+                                        'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+                dfexpo = dfexpo.append({'Date': i, 'order': "Sell", 'open': df[df["Date"] == i]["Open"].values,
+                                        'close': df[df["Date"] == i]["Close"].values,
+                                        'high': df[df["Date"] == i]["High"].values,
+                                        'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+                print("SEll  =" + str(df[(df["Date"] == i)]))
+        if (exitime in i ):
+            print("Iniside exit time buy block before " + str(BUY) + str(buyorder) + str(SELL) + i)
+            if (BUY == False and buyorder == 0):
+                BUY = False
+                SEll = False
+                buyorder = 0
+                firstorder=0
+                dfexpo = dfexpo.append(
+                    {'Date': i, 'order': "Buy", 'open': df[df["Date"] == i]["Open"].values,
+                     'close': df[df["Date"] == i]["Close"].values,
+                     'high': df[df["Date"] == i]["High"].values,
+                     'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+            print("Iniside exit time buy block " + str(BUY) + str(buyorder) + str(SELL) + i)
+
+        if (exitime in i):
+            print("Iniside exit time sell block before " + str(BUY) + str(buyorder) + str(SELL) + i)
+            if (SELL == False and buyorder == 1):
+                BUY = False
+                SEll = False
+                buyorder = 0
+                firstorder=0
+                dfexpo = dfexpo.append(
+                    {'Date': i, 'order': "Sell", 'open': df[df["Date"] == i]["Open"].values,
+                     'close': df[df["Date"] == i]["Close"].values,
+                     'high': df[df["Date"] == i]["High"].values,
+                     'low': df[df["Date"] == i]["Low"].values}, ignore_index=True)
+                print("koki not going")
+            print("Iniside exit time sell block " + str(BUY) + str(buyorder) + str(SELL) + i)
+dfexpo.to_csv(r'D:\\tradedata\\NIFTY50sellbuynew.csv')
+final=pd.read_csv("D:\\tradedata\\NIFTY50sellbuynew.csv")
+final['open'] = final['open'].str.replace('[', ' ')
+final['close'] = final['close'].str.replace(']', ' ')
+final['low'] = final['low'].str.replace('[', ' ')
+final['high'] = final['high'].str.replace(']', ' ')
+final['open'] = final['open'].str.replace(']', ' ')
+final['close'] = final['close'].str.replace('[', ' ')
+final['low'] = final['low'].str.replace(']', ' ')
+final['high'] = final['high'].str.replace('[', ' ')
+final = final.drop(final.columns[[0]], axis=1)
+#print(final)
+
+final.to_csv(r'D:\\tradedata\\NIFTY50sellbuynew1.csv')
+rows=len(final)
+profitpointsbuy=0
+profitpointssell=0
+profitpoint=0
+cumlprofit=pd.DataFrame(columns= ['Date','Open','High','Low','Close','Order','CumulativeProfit','Buyprofit','Sellprofit'])
+for i in range(0,rows-1):
+    if(final["order"].values[i]=="Buy" and final["order"].values[i+1]=="Sell"):
+       print(float(final["close"].values[i+1])-float(final["close"].values[i]))
+       print(final["close"].values[i+1])
+       print(final["close"].values[i])
+       #print(type(final["close"].values[i]))
+       profitpoint=profitpoint+float(final["close"].values[i+1])-float(final["close"].values[i])
+       profitpointsbuy=float(final["close"].values[i+1])-float(final["close"].values[i])
+       cumlprofit=cumlprofit.append({'Date':final["Date"].values[i],'Open':final["open"].values[i],'High':final["high"].values[i],'Low':final["low"].values[i],'Close':final["close"].values[i],'High':final["high"].values[i],'Order':final["order"].values[i],'CumulativeProfit':round(profitpoint,2),'Buyprofit': round(profitpointsbuy,2),'Sellprofit': 0},ignore_index=True)
+    if (final["order"].values[i] == "Sell" and final["order"].values[i + 1] == "Buy"):
+        print(float(final["close"].values[i]) - float(final["close"].values[i+1]))
+        print(final["close"].values[i + 1])
+        print(final["close"].values[i])
+        #print(type(final["close"].values[i]))
+        profitpoint = profitpoint + float(final["close"].values[i ]) - float(final["close"].values[i+1])
+        profitpointssell = float(final["close"].values[i ]) - float(final["close"].values[i+1])
+        cumlprofit = cumlprofit.append(
+            {'Date': final["Date"].values[i], 'Open': final["open"].values[i], 'High': final["high"].values[i], 'Low': final["low"].values[i],
+             'Close': final["close"].values[i], 'High': final["high"].values[i], 'Order': final["order"].values[i],
+             'CumulativeProfit':round(profitpoint,2),'Buyprofit': 0,'Sellprofit': round(profitpointssell,2)}, ignore_index=True)
+    if (final["order"].values[i] == "Sell" and final["order"].values[i + 1] == "Sell"):
+        print(float(final["close"].values[i]) - float(final["close"].values[i+1]))
+        print(final["close"].values[i + 1])
+        print(final["close"].values[i])
+        profitpointsbuy = 0
+        profitpointssell = 0
+
+        cumlprofit = cumlprofit.append(
+            {'Date': final["Date"].values[i], 'Open': final["open"].values[i], 'High': final["high"].values[i], 'Low': final["low"].values[i],
+             'Close': final["close"].values[i], 'High': final["high"].values[i], 'Order': final["order"].values[i],
+             'CumulativeProfit':round(profitpoint,2),'Buyprofit': 0,'Sellprofit': 0}, ignore_index=True)
+    if (final["order"].values[i] == "Buy" and final["order"].values[i + 1] == "Buy"):
+            print(float(final["close"].values[i]) - float(final["close"].values[i + 1]))
+            print(final["close"].values[i + 1])
+            print(final["close"].values[i])
+            profitpointsbuy = 0
+            profitpointssell = 0
+            cumlprofit = cumlprofit.append(
+                {'Date': final["Date"].values[i], 'Open': final["open"].values[i], 'High': final["high"].values[i],
+                 'Low': final["low"].values[i],
+                 'Close': final["close"].values[i], 'High': final["high"].values[i], 'Order': final["order"].values[i],
+                 'CumulativeProfit': round(profitpoint, 2),'Buyprofit': 0,'Sellprofit': 0}, ignore_index=True)
+
+print("profitpointssell "+str(profitpoint))
+cumlprofit.round(2)
+cumlprofit.to_csv(r'D:\\tradedata\\cumprofitcsv.csv')
+
+#final.plot(kind='bar',x='Date',y=['CumulativeProfit'])
+cumlprofit.plot(x='Date',y='CumulativeProfit',style='.-')
+#cumlprofit.plot(kind='bar',x='Date',y=['Buyprofit','Sellprofit'])
+df.plot(x='Date',y='Close',style='.-')
+#final.plot(x='Date',y='Spot',style='.-')
+
+plt.title("Cumulative profits")
+plt.show()
+print("code complete")
